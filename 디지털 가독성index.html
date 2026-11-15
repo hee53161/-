@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ReadEasy | 스마트 가독성 최적화</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
+  background: #f4f6fa;
+  color: #202a3a;
+}
+
+header {
+  background: #263c65;
+  color: white;
+  padding: 25px 20px;
+}
+
+.header-inner {
+  max-width: 1000px;
+  margin: auto;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+header p {
+  color: #dce5f5;
+  margin: 8px 0 0;
+}
+
+main {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 18px;
+}
+
+.panel {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+}
+
+h2 {
+  font-size: 19px;
+  margin: 0 0 15px;
+}
+
+.description {
+  font-size: 14px;
+  color: #718096;
+  line-height: 1.6;
+}
+
+textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 16px;
+  border: 1px solid #d6dce6;
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+textarea:focus {
+  border-color: #315da8;
+}
+
+button, select {
+  font: inherit;
+}
+
+button {
+  border: none;
+  border-radius: 9px;
+  padding: 12px 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+.primary {
+  background: #315da8;
+  color: white;
+}
+
+.secondary {
+  background: #e9eef6;
+  color: #263c65;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 13px;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.setting label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 9px;
+}
+
+.setting select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #d6dce6;
+  border-radius: 9px;
+  background: white;
+}
+
+#status {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #58749f;
+}
+
+.reader {
+  padding: 0;
+  overflow: hidden;
+}
+
+.reader-heading {
+  padding: 20px 24px;
+  background: white;
+  border-bottom: 1px solid #e8ebf0;
+}
+
+.reader-heading h2 {
+  margin: 0;
+}
+
+#readingScreen {
+  width: 100%;
+  min-height: 480px;
+  padding: 40px;
+  font-size: 18px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #111111;
+  color: #ffffff;
+  transition: background 0.2s, color 0.2s;
+}
+
+.reader-footer {
+  padding: 15px 24px;
+  background: white;
+  color: #718096;
+  font-size: 13px;
+}
+
+@media(max-width: 650px) {
+  .settings {
+    grid-template-columns: 1fr;
+  }
+
+  #readingScreen {
+    padding: 24px;
+    min-height: 400px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>ReadEasy</h1>
+    <p>나에게 맞는 읽기 화면을 자동으로 찾아보세요.</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- 텍스트 입력 -->
+  <section class="panel">
+    <h2>① 읽을 글 입력하기</h2>
+
+    <p class="description">
+      읽고 싶은 글을 입력하거나 복사해서 붙여넣으세요.
+    </p>
+
+    <textarea
+      id="textInput"
+      placeholder="이곳에 읽고 싶은 글을 입력하세요."
+    ></textarea>
+
+    <div class="button-group">
+      <button class="primary" onclick="loadText()">
+        글 불러오기
+      </button>
+
+      <button class="secondary" onclick="clearText()">
+        지우기
+      </button>
+    </div>
+  </section>
+
+  <!-- 자동 최적화 -->
+  <section class="panel">
+    <h2>② 가독성 자동 최적화</h2>
+
+    <p class="description">
+     더 편안한 읽기를 위해 화면을 자동으로 최적화합니다.
+    </p>
+
+    <button class="primary" onclick="autoOptimize()">
+      ✨ 자동 최적화하기
+    </button>
+
+    <div id="status">
+      글을 입력한 후 자동 최적화를 실행하세요.
+    </div>
+  </section>
+
+  <!-- 사용자 설정 -->
+  <section class="panel">
+    <h2>③ 나에게 맞게 화면 조절하기</h2>
+
+    <div class="settings">
+
+      <div class="setting">
+        <label for="fontSize">글씨 크기</label>
+
+        <select id="fontSize" onchange="applySettings()">
+          <option value="16">작게</option>
+          <option value="18" selected>보통</option>
+          <option value="20">크게</option>
+          <option value="24">매우 크게</option>
+          <option value="28">아주 크게</option>
+        </select>
+      </div>
+
+      <div class="setting">
+        <label for="lineSpacing">줄 간격</label>
+
+        <select id="lineSpacing" onchange="applySettings()">
+          <option value="1.4">좁게</option>
+          <option value="1.6">보통</option>
+          <option value="1.9" selected>넓게</option>
+          <option value="2.2">매우 넓게</option>
+        </select>
+      </div>
+
+      <div class="setting">
+        <label for="theme">화면 색상</label>
+
+        <select id="theme" onchange="applySettings()">
+          <option value="light">흰 배경 + 검은 글씨</option>
+          <option value="dark" selected>검은 배경 + 흰 글씨</option>
+          <option value="cream">크림색 배경 + 검은 글씨</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="button-group">
+      <button class="secondary" onclick="resetSettings()">
+        기본 설정으로 되돌리기
+      </button>
+    </div>
+  </section>
+
+  <!-- 최적화된 읽기 화면 -->
+  <section class="panel reader">
+
+    <div class="reader-heading">
+      <h2>④ 최적화된 읽기 화면</h2>
+    </div>
+
+    <div id="readingScreen">
+      글을 입력하고 최적화 버튼을 누르면
+      이곳에 읽기 화면이 표시됩니다.
+    </div>
+
+    <div class="reader-footer">
+      ReadEasy · 나에게 맞는 읽기 환경
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+
+// 화면에 표시할 글
+const textInput = document.getElementById("textInput");
+const readingScreen = document.getElementById("readingScreen");
+const statusText = document.getElementById("status");
+
+// 글 불러오기
+function loadText() {
+
+  const text = textInput.value.trim();
+
+  if (!text) {
+    alert("먼저 읽을 글을 입력해주세요.");
+    return;
+  }
+
+  readingScreen.textContent = text;
+
+  statusText.textContent =
+    "글을 불러왔습니다. 자동 최적화를 실행할 수 있습니다.";
+}
+
+// 자동 최적화
+function autoOptimize() {
+
+  const text = textInput.value.trim();
+
+  if (!text) {
+    alert("먼저 읽을 글을 입력해주세요.");
+    return;
+  }
+
+  readingScreen.textContent = text;
+
+  // 실험 결과 기반 추천 설정
+  document.getElementById("fontSize").value = "18";
+  document.getElementById("lineSpacing").value = "1.9";
+  document.getElementById("theme").value = "dark";
+
+  applySettings();
+
+  statusText.textContent =
+    "최적화 완료! 넓은 줄 간격과 검은 배경을 적용했습니다.";
+}
+
+// 화면 설정 적용
+function applySettings() {
+
+  const size =
+    document.getElementById("fontSize").value;
+
+  const spacing =
+    document.getElementById("lineSpacing").value;
+
+  const theme =
+    document.getElementById("theme").value;
+
+  readingScreen.style.fontSize = size + "px";
+  readingScreen.style.lineHeight = spacing;
+
+  if (theme === "dark") {
+
+    readingScreen.style.backgroundColor = "#111111";
+    readingScreen.style.color = "#ffffff";
+
+  } else if (theme === "light") {
+
+    readingScreen.style.backgroundColor = "#ffffff";
+    readingScreen.style.color = "#222222";
+
+  } else if (theme === "cream") {
+
+    readingScreen.style.backgroundColor = "#f5edda";
+    readingScreen.style.color = "#333333";
+
+  }
+
+  statusText.textContent =
+    "화면 설정이 변경되었습니다.";
+}
+
+// 초기화
+function resetSettings() {
+
+  document.getElementById("fontSize").value = "16";
+  document.getElementById("lineSpacing").value = "1.6";
+  document.getElementById("theme").value = "light";
+
+  applySettings();
+}
+
+// 글 지우기
+function clearText() {
+
+  textInput.value = "";
+
+  readingScreen.textContent =
+    "글을 입력하고 최적화 버튼을 누르면 이곳에 읽기 화면이 표시됩니다.";
+
+  resetSettings();
+
+  statusText.textContent =
+    "입력 내용이 삭제되었습니다.";
+}
+
+</script>
+
+</body>
+</html>
